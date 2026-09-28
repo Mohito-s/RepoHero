@@ -100,21 +100,21 @@ export function synthesizeRepoIntelligence(
   const nodes: string[] = [];
   const edges: string[] = [];
 
-  nodes.push(`Visitor([👤 Client / Visitor])`);
+  nodes.push(`Visitor(["👤 Client / Visitor"])`);
 
   if (files.some(f => f.includes('index.html'))) {
-    nodes.push(`Landing[🏠 Public Landing Page (index.html)]`);
-    edges.push(`Visitor -->|Views Works & Submits Form| Landing`);
+    nodes.push(`Landing["🏠 Public Landing Page (index.html)"]`);
+    edges.push(`Visitor -->|Views Works| Landing`);
   }
 
   if (files.some(f => f.includes('admin.html'))) {
-    nodes.push(`Admin[🛡️ Admin Dashboard (admin.html)]`);
-    nodes.push(`Owner([👨‍🔧 Master / Admin])`);
-    edges.push(`Owner -->|Manages Portfolio & Leads| Admin`);
+    nodes.push(`Admin["🛡️ Admin Dashboard (admin.html)"]`);
+    nodes.push(`Owner(["👨‍🔧 Master / Admin"])`);
+    edges.push(`Owner -->|Manages Content| Admin`);
   }
 
   if (files.some(f => f.includes('server.js') || f.includes('server.ts') || f.includes('api/'))) {
-    nodes.push(`Server[⚙️ Node.js Server (server.js)]`);
+    nodes.push(`Server["⚙️ Node.js Server (server.js)"]`);
     edges.push(`Landing -->|POST /api/leads| Server`);
     if (files.some(f => f.includes('admin.html'))) {
       edges.push(`Admin -->|Fetch / Auth| Server`);
@@ -122,21 +122,21 @@ export function synthesizeRepoIntelligence(
   }
 
   if (files.some(f => f.includes('data/'))) {
-    nodes.push(`Storage[(📂 Persistent Storage / data/*.json)]`);
+    nodes.push(`Storage[("📂 Storage (data/*.json)")]`);
     if (files.some(f => f.includes('server.js'))) {
-      edges.push(`Server -->|Saves Leads & Portfolio| Storage`);
+      edges.push(`Server -->|Saves Leads| Storage`);
     }
   }
 
   if (combinedText.includes('email') || combinedText.includes('mail')) {
-    nodes.push(`Notifier[📧 Mail Delivery / Postfix Dispatcher]`);
+    nodes.push(`Notifier["📧 Mail Delivery / Postfix"]`);
     if (files.some(f => f.includes('server.js'))) {
-      edges.push(`Server -->|Dispatches Alerts| Notifier`);
+      edges.push(`Server -->|Alerts| Notifier`);
     }
   }
 
   const mermaidDiagram = `graph TD
-    %% Auto-synthesized Architecture from Commits & Git Tree
+    %% Auto-synthesized Architecture
     ${nodes.join('\n    ')}
     ${edges.join('\n    ')}
     classDef nodeHighlight fill:#1e2235,stroke:#6366f1,stroke-width:2px,color:#f8fafc;
