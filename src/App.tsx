@@ -28,11 +28,12 @@ mermaid.initialize({
   startOnLoad: false,
   theme: 'dark',
   securityLevel: 'loose',
+  suppressErrorRendering: true,
 });
 
 export default function App() {
   const [config, setConfig] = useState<RepoHeroConfig>(DEFAULT_CONFIG);
-  const [githubInput, setGithubInput] = useState('Mohito-s/olcwave');
+  const [githubInput, setGithubInput] = useState('Mohito-s/RepoHero');
   const [isLoading, setIsLoading] = useState(false);
   const [activeTab, setActiveTab] = useState<'editor' | 'raw' | 'diagram' | 'social' | 'audit'>('editor');
   const [copied, setCopied] = useState(false);
@@ -67,12 +68,23 @@ export default function App() {
   useEffect(() => {
     let isCurrent = true;
     const renderDiagram = async () => {
+      if (!config.architectureMermaid || !config.architectureMermaid.trim()) {
+        if (isCurrent) setMermaidSvg('');
+        return;
+      }
       try {
-        const uniqueId = `mermaid-${Date.now()}`;
+        const uniqueId = `mermaid-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
         const { svg } = await mermaid.render(uniqueId, config.architectureMermaid);
         if (isCurrent) setMermaidSvg(svg);
+        // Clean up any lingering error SVG elements injected by mermaid into document.body
+        const errorDoms = document.querySelectorAll('svg[id^="dmermaid"], [id^="mermaid-error"]');
+        errorDoms.forEach(el => el.remove());
       } catch (e) {
         console.warn('Mermaid syntax error or render pending:', e);
+        // Do not display red bomb, keep previous or clear
+        // Clean up any error SVGs added by mermaid
+        const errorDoms = document.querySelectorAll('svg[id^="dmermaid"], [id^="mermaid-error"]');
+        errorDoms.forEach(el => el.remove());
       }
     };
     renderDiagram();

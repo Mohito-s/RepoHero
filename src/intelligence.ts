@@ -99,48 +99,68 @@ export function synthesizeRepoIntelligence(
   // 4. Construct Real Architecture Mermaid
   const nodes: string[] = [];
   const edges: string[] = [];
+  const activeIds: string[] = [];
 
-  nodes.push(`Visitor(["👤 Client / Visitor"])`);
+  nodes.push('Visitor(["👤 Client / Visitor"])');
+  activeIds.push('Visitor');
 
   if (files.some(f => f.includes('index.html'))) {
-    nodes.push(`Landing["🏠 Public Landing Page (index.html)"]`);
-    edges.push(`Visitor -->|Views Works| Landing`);
+    nodes.push('Landing["🏠 Public Landing Page (index.html)"]');
+    edges.push('Visitor -->|"Views Site"| Landing');
+    activeIds.push('Landing');
   }
 
-  if (files.some(f => f.includes('admin.html'))) {
-    nodes.push(`Admin["🛡️ Admin Dashboard (admin.html)"]`);
-    nodes.push(`Owner(["👨‍🔧 Master / Admin"])`);
-    edges.push(`Owner -->|Manages Content| Admin`);
+  if (files.some(f => f.includes('admin.html') || f.includes('admin'))) {
+    nodes.push('Admin["🛡️ Admin Dashboard"]');
+    nodes.push('Owner(["👨‍🔧 Administrator"])');
+    edges.push('Owner -->|"Manages Content"| Admin');
+    activeIds.push('Admin', 'Owner');
   }
 
   if (files.some(f => f.includes('server.js') || f.includes('server.ts') || f.includes('api/'))) {
-    nodes.push(`Server["⚙️ Node.js Server (server.js)"]`);
-    edges.push(`Landing -->|POST /api/leads| Server`);
-    if (files.some(f => f.includes('admin.html'))) {
-      edges.push(`Admin -->|Fetch / Auth| Server`);
+    nodes.push('Server["⚙️ Backend Server"]');
+    if (activeIds.includes('Landing')) {
+      edges.push('Landing -->|"API Requests"| Server');
     }
+    if (activeIds.includes('Admin')) {
+      edges.push('Admin -->|"Auth & Mutations"| Server');
+    }
+    activeIds.push('Server');
   }
 
-  if (files.some(f => f.includes('data/'))) {
-    nodes.push(`Storage[("📂 Storage (data/*.json)")]`);
-    if (files.some(f => f.includes('server.js'))) {
-      edges.push(`Server -->|Saves Leads| Storage`);
+  if (files.some(f => f.includes('data/') || f.includes('db') || f.includes('prisma') || f.includes('models'))) {
+    nodes.push('Storage[("📂 Persistent Data Storage")]');
+    if (activeIds.includes('Server')) {
+      edges.push('Server -->|"Saves Data"| Storage');
     }
+    activeIds.push('Storage');
   }
 
-  if (combinedText.includes('email') || combinedText.includes('mail')) {
-    nodes.push(`Notifier["📧 Mail Delivery / Postfix"]`);
-    if (files.some(f => f.includes('server.js'))) {
-      edges.push(`Server -->|Alerts| Notifier`);
+  if (combinedText.includes('email') || combinedText.includes('mail') || combinedText.includes('bot')) {
+    nodes.push('Notifier["📧 Notification Service"]');
+    if (activeIds.includes('Server')) {
+      edges.push('Server -->|"Dispatches Alerts"| Notifier');
     }
+    activeIds.push('Notifier');
   }
+
+  // Fallback edge if only 1 node
+  if (edges.length === 0) {
+    nodes.push('App["⚡ Application Core"]');
+    edges.push('Visitor -->|"Interacts"| App');
+    activeIds.push('App');
+  }
+
+  const highlightClassLine = activeIds.length > 0 
+    ? `class ${activeIds.join(',')} nodeHighlight;` 
+    : '';
 
   const mermaidDiagram = `graph TD
     %% Auto-synthesized Architecture
     ${nodes.join('\n    ')}
     ${edges.join('\n    ')}
     classDef nodeHighlight fill:#1e2235,stroke:#6366f1,stroke-width:2px,color:#f8fafc;
-    class Landing,Admin,Server,Storage,Notifier nodeHighlight;`;
+    ${highlightClassLine}`;
 
   // 5. Tech stack detection
   const techStack: Array<{ name: string; category: string; badgeSlug: string; color: string }> = [];

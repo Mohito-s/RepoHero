@@ -33,17 +33,17 @@ export interface RepoHeroConfig {
 }
 
 export const DEFAULT_CONFIG: RepoHeroConfig = {
-  repoName: 'super-awesome-project',
-  tagline: 'The lightning-fast, zero-ops toolkit for modern developers',
-  description: 'An open-source, local-first engine designed to supercharge your developer workflow with instant visual previews and smart automation.',
-  githubUrl: 'https://github.com/developer/super-awesome-project',
-  owner: 'developer',
-  stars: 1420,
-  forks: 185,
+  repoName: 'RepoHero',
+  tagline: 'Instant README & Architecture Flowchart Generator for Modern Repos',
+  description: 'An open-source, local-first engine designed to supercharge developer documentation with instant visual previews, dynamic Shields.io badges, and smart architecture diagrams.',
+  githubUrl: 'https://github.com/Mohito-s/RepoHero',
+  owner: 'Mohito-s',
+  stars: 12,
+  forks: 2,
   license: 'MIT',
   primaryLanguage: 'TypeScript',
-  languages: { TypeScript: 82, CSS: 12, HTML: 6 },
-  demoUrl: 'https://super-awesome-project.dev',
+  languages: { TypeScript: 85, CSS: 10, HTML: 5 },
+  demoUrl: 'https://mohito-s.github.io/RepoHero/',
   
   badgeStyle: 'for-the-badge',
   badges: {
@@ -51,7 +51,7 @@ export const DEFAULT_CONFIG: RepoHeroConfig = {
     license: true,
     issues: true,
     prs: true,
-    build: true,
+    build: false, // Turned off by default to prevent "REPO OR WORKFLOW NOT FOUND"
     visitors: false,
   },
   features: [
@@ -72,14 +72,16 @@ export const DEFAULT_CONFIG: RepoHeroConfig = {
     run: 'pnpm dev',
   },
   architectureMermaid: `graph TD
-    Client[Web / Desktop UI] -->|Local FileSystem API| Parser[Repo Parser Engine]
-    Client -->|REST Fetch| GitHubAPI[GitHub Public API]
-    Parser --> StateStore[Local State & Cache]
+    Client["🖥️ Web UI (Local-First)"] -->|"📁 Local Directory / File"| Parser["⚙️ Parser Engine"]
+    Client -->|"🌐 REST API Fetch"| GitHubAPI["🐙 GitHub Public API"]
+    Parser --> StateStore["💾 Local State & Memory Cache"]
     GitHubAPI --> StateStore
-    StateStore --> MarkdownGen[Markdown & Shields Builder]
-    StateStore --> MermaidGen[Mermaid Diagrams]
-    MarkdownGen --> LivePreview[Live GitHub Preview]
-    LivePreview --> Export[Copy / Download README.md]`,
+    StateStore --> MarkdownGen["📝 Markdown & Shields Builder"]
+    StateStore --> MermaidGen["📊 Mermaid Diagram Synthesizer"]
+    MarkdownGen --> LivePreview["👁️ Live Interactive Preview"]
+    LivePreview --> Export["🚀 Copy / Download README.md"]
+    classDef nodeHighlight fill:#1e2235,stroke:#6366f1,stroke-width:2px,color:#f8fafc;
+    class Client,Parser,GitHubAPI,StateStore,MarkdownGen,MermaidGen,LivePreview,Export nodeHighlight;`,
   changelogItems: [
     {
       version: 'v1.2.0',
